@@ -4,18 +4,54 @@
     "$className": "DataModel",
 
     "ReplicatedStorage": {
-        "$path": "src/shared"
+        "$path": "src/shared",
+        "Events": {
+          "$className": "Folder"
+        }
     },
 
     "ServerScriptService": {
-        "$path": "src/server"
+        "AttackHitboxes": {
+          "$path": "src/server/AttackHitboxes.luau"
+        },
+        "ServerAttackhandler": {
+          "$path": "src/server/ServerAttackhandler.server.luau",
+          "PunchAnimationCycle" : {
+            "$className": "Folder"
+          },
+          "Characters": {
+            "$className": "Folder",
+            "Hunter": {
+              "$className": "Folder",
+              "1": {
+                "$path": "src/server/1.luau"
+              }
+            }
+          },
+          "Animations": {
+            "$className": "Folder"
+          }
+
+        },
+        "DataHandler": {
+          "$path": "src/server/DataHandler.server.luau",
+          "PlayerValues": {
+            "$className": "Folder",
+            "$path": "src/server/DataHandler/PlayerValues",
+            "Values": {
+              "$className": "Folder"
+            }
+          }
+        }
      },
 
     "StarterPlayer": {
+      "StarterCharacterScripts": {
+        "$path": "src/StarterCharacterScripts"
+   
+      },
       "StarterPlayerScripts": {
-        "Client": {
           "$path": "src/client"
-        }
       }
     },
     
