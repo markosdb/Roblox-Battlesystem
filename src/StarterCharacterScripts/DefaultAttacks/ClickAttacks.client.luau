@@ -17,13 +17,13 @@ UserInputService.InputBegan:Connect(function(Input, GameProcessedEvent)
 
     if Input.KeyCode == Enum.KeyCode.F then
         IsBlocking = true
-        Events.Blocking:FireServer(true)
+        Events.Block:FireServer(true)
     end
 end)
 UserInputService.InputEnded:Connect(function(Input, GameProcessedEvent)
     if GameProcessedEvent then return end
     if Input.KeyCode == Enum.KeyCode.F then
         IsBlocking = false
-        Events.Blocking:FireServer(false)
+        Events.Block:FireServer(false)
     end
 end)
