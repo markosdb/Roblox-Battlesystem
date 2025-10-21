@@ -11,6 +11,16 @@
     },
 
     "ServerScriptService": {
+      "ProfileManager": {
+        "$path": "src/server/ProfileManager.luau",
+        "ProfileFolder": {
+          "$className": "Folder",
+          "ProfileTemplate": {
+            "$className": "ModuleScript",
+            "$path": "src/server/ProfileManager/ProfileTemplate.module.luau"
+          }
+        }
+      },
         "AttackHitboxes": {
           "$path": "src/server/AttackHitboxes.luau"
         },

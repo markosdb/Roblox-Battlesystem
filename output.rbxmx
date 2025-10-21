@@ -24,10 +24,7 @@
       <Item class="ModuleScript" referent="3">
         <Properties>
           <string name="Name">Hello</string>
-          <string name="Source"><![CDATA[return function()
-	print("Hello, world!")
-end
-]]></string>
+          <string name="Source"></string>
         </Properties>
       </Item>
       <Item class="Folder" referent="4">
@@ -43,8 +40,41 @@ end
       <Item class="ModuleScript" referent="6">
         <Properties>
           <string name="Name">AttackHitboxes</string>
-          <string name="Source"><![CDATA[print("Hello world, from server!")
-]]></string>
+          <string name="Source"><![CDATA[local module = {}
+
+function module.createHitbox(Character, HitboxSize, Damage, Blockable)
+    local Hitbox = Instance.new("Part")
+    Hitbox.Transparency = 0.9
+    Hitbox.BrickColor = BrickColor.new("Bright red")
+    Hitbox.CanCollide = false
+    Hitbox.Anchored = true
+    Hitbox.Size = HitboxSize
+    Hitbox.CFrame = Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -3)
+    Hitbox.Parent = workspace
+
+    local PartsInHitbox = workspace:GetPartsInPart(Hitbox)
+    local Debounces = {}
+
+    for _, v in PartsInHitbox do
+        local Humanoid = v.Parent:FindFirstChild("Humanoid") or v.Parent.Parent:FindFirstChild("Humanoid")
+        if Humanoid and Humanoid.Parent ~= Character and not Debounces[Humanoid] then
+            Debounces[Humanoid] = true
+            if Blockable then
+                if not Humanoid.Parent:FindFirstChild("Blocking") then
+                    Humanoid.Health = math.max(0, Humanoid.Health - Damage)
+                end
+            else
+                Humanoid.Health = math.max(0, Humanoid.Health - Damage)
+            end
+        end
+    end
+   
+    task.delay(0.3, function()
+        Hitbox:Destroy()
+    end)
+end
+
+return module ]]></string>
         </Properties>
       </Item>
       <Item class="Script" referent="7">
@@ -71,11 +101,18 @@ end)</string>
           </Item>
         </Item>
       </Item>
-      <Item class="Script" referent="10">
+      <Item class="ModuleScript" referent="10">
+        <Properties>
+          <string name="Name">ProfileManager</string>
+          <string name="Source"></string>
+        </Properties>
+      </Item>
+      <Item class="Script" referent="11">
         <Properties>
           <string name="Name">ServerAttackhandler</string>
           <token name="RunContext">0</token>
-          <string name="Source">local ReplicatedStorage = game:GetService("ReplicatedStorage")
+          <string name="Source">print("ServerAttackhandler loaded properly")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 local Events = ReplicatedStorage.Events
@@ -86,88 +123,93 @@ local ClickAttackDebounces = {}
 
 Events.ClickAttack.OnServerEvent:Connect(function(Player)
     local Character = Player.Character
-    if not Character then
-        warn("[ServerAttackhandler] Player has no Character")
+    if Character == nil then
         return
     end
-    local Humanoid = Character:FindFirstChildOfClass("Humanoid")
-    if not Humanoid then
-        warn("[ServerAttackhandler] Humanoid missing for", Player.Name)
+    local Humanoid = Character:FindFirstChild("Humanoid")
+    if Humanoid == nil then
         return
     end
-    if Humanoid.Health and Humanoid.Health &lt;= 0 then
-        warn("[ServerAttackhandler] Humanoid dead for", Player.Name)
+    if Humanoid.Health &lt;= 0 then
         return
     end
     if ClickAttackDebounces[Player] then
         return
     end
-
+    
     ClickAttackDebounces[Player] = true
     local PunchCombo = Player.Values.PunchCombo
-    local animContainer = script:FindFirstChild("PunchAnimationCycle")
-    if not animContainer then
-        warn("[ServerAttackhandler] PunchAnimationCycle folder not found under script")
-        ClickAttackDebounces[Player] = nil
-        return
-    end
-    local animName = tostring(PunchCombo.Value)
-    local Animation = animContainer:FindFirstChild(animName)
-    if not Animation then
-        warn("[ServerAttackhandler] No animation child named", animName)
-        ClickAttackDebounces[Player] = nil
-        return
-    end
-    if not Animation:IsA("Animation") then
-        warn("[ServerAttackhandler] Expected Animation instance, got", Animation.ClassName)
-    end
-    if not Animation.AnimationId or Animation.AnimationId == "" then
-        warn("[ServerAttackhandler] Animation has empty AnimationId")
-    end
-    local animator = Humanoid:FindFirstChildOfClass("Animator") or Humanoid:FindFirstChild("Animator")
-    if not animator then
-        animator = Instance.new("Animator")
-        animator.Parent = Humanoid
-        warn("[ServerAttackhandler] Created Animator for", Player.Name)
-    end
-    local ok, track = pcall(function()
-        return animator:LoadAnimation(Animation)
-    end)
-    if not ok or not track then
-        warn("[ServerAttackhandler] Failed to load animation for", Player.Name, ok and tostring(track) or track)
-        ClickAttackDebounces[Player] = nil
-        return
-    end
-    track:Play()
-    warn("[ServerAttackhandler] Played animation", animName, "for", Player.Name)
+    local Animation = script.PunchAnimationCycle[tostring(PunchCombo.Value)]
+    local LoadedPunchAnimation = Humanoid.Animator:LoadAnimation(Animation)
+    LoadedPunchAnimation:Play()
 
-    if PunchCombo.Value >= #script.PunchAnimationCycle:GetChildren() then
+    if tonumber(PunchCombo.Value) >= #script.PunchAnimationCycle:GetChildren() then
         PunchCombo.Value = 1
     else
         PunchCombo.Value += 1
     end
+    
+    LoadedPunchAnimation:GetMarkerReachedSignal("Hit"):Connect(function()
+        AttackHitboxes.createHitbox(Character, Vector3.new(9, 9, 5), 10, true)
+    end)
+    
 
-    task.wait((track.Length or 0) + 0.1)
+    task.wait(LoadedPunchAnimation.Length + 0.1)
     if ClickAttackDebounces[Player] then
         ClickAttackDebounces[Player] = nil
     end
 
+end)
+
+Events.Block.OnServerEvent:Connect(function(Player, Value)
+    local Character = Player.Character
+    if Character == nil then
+        return
+    end
+    local Humanoid = Character:FindFirstChild("Humanoid")
+    if Humanoid == nil then
+        return
+    end
+    if Humanoid.Health &lt;= 0 then
+        return
+    end
+    if ClickAttackDebounces[Player] then
+        return
+    end
+
+    if not Value then
+        local LoadedAnimations = Humanoid.Animator:GetPlayingAnimationTracks()
+        for _, v in LoadedAnimations do
+            if v.Name == "Block" then
+                v:Stop()
+            end
+        end
+        if Character:FindFirstChild("Blocking") then
+            Character.Blocking:Destroy()
+        end
+    else
+        local BlockAnimation = Humanoid.Animator:LoadAnimation(script.Animations.Block)
+        BlockAnimation:Play()
+        local Blocking = Instance.new("StringValue")
+        Blocking.Name = "Blocking"
+        Blocking.Parent = Character
+    end
 end)</string>
         </Properties>
-        <Item class="Folder" referent="11">
+        <Item class="Folder" referent="12">
           <Properties>
             <string name="Name">Animations</string>
           </Properties>
         </Item>
-        <Item class="Folder" referent="12">
+        <Item class="Folder" referent="13">
           <Properties>
             <string name="Name">Characters</string>
           </Properties>
-          <Item class="Folder" referent="13">
+          <Item class="Folder" referent="14">
             <Properties>
               <string name="Name">Hunter</string>
             </Properties>
-            <Item class="ModuleScript" referent="14">
+            <Item class="ModuleScript" referent="15">
               <Properties>
                 <string name="Name">1</string>
                 <string name="Source">local module = {}
@@ -177,37 +219,37 @@ return module</string>
             </Item>
           </Item>
         </Item>
-        <Item class="Folder" referent="15">
+        <Item class="Folder" referent="16">
           <Properties>
             <string name="Name">PunchAnimationCycle</string>
           </Properties>
         </Item>
       </Item>
     </Item>
-    <Item class="SoundService" referent="16">
+    <Item class="SoundService" referent="17">
       <Properties>
         <string name="Name">SoundService</string>
         <bool name="RespectFilteringEnabled">true</bool>
       </Properties>
     </Item>
-    <Item class="StarterPlayer" referent="17">
+    <Item class="StarterPlayer" referent="18">
       <Properties>
         <string name="Name">StarterPlayer</string>
       </Properties>
-      <Item class="StarterCharacterScripts" referent="18">
+      <Item class="StarterCharacterScripts" referent="19">
         <Properties>
           <string name="Name">StarterCharacterScripts</string>
         </Properties>
-        <Item class="Folder" referent="19">
+        <Item class="Folder" referent="20">
           <Properties>
             <string name="Name">CharacterAttacks</string>
           </Properties>
         </Item>
-        <Item class="Folder" referent="20">
+        <Item class="Folder" referent="21">
           <Properties>
             <string name="Name">DefaultAttacks</string>
           </Properties>
-          <Item class="LocalScript" referent="21">
+          <Item class="LocalScript" referent="22">
             <Properties>
               <string name="Name">ClickAttacks</string>
               <string name="Source">local UserInputService = game:GetService("UserInputService")
@@ -224,29 +266,30 @@ UserInputService.InputBegan:Connect(function(Input, GameProcessedEvent)
     if GameProcessedEvent then return end
     if Input.UserInputType == Enum.UserInputType.MouseButton1 and not IsBlocking then
         Events.ClickAttack:FireServer()
+        print("Fired ClickAttack event")
     end
 
     if Input.KeyCode == Enum.KeyCode.F then
         IsBlocking = true
-        Events.Blocking:FireServer(true)
+        Events.Block:FireServer(true)
     end
 end)
 UserInputService.InputEnded:Connect(function(Input, GameProcessedEvent)
     if GameProcessedEvent then return end
     if Input.KeyCode == Enum.KeyCode.F then
         IsBlocking = false
-        Events.Blocking:FireServer(false)
+        Events.Block:FireServer(false)
     end
 end)</string>
             </Properties>
           </Item>
         </Item>
       </Item>
-      <Item class="StarterPlayerScripts" referent="22">
+      <Item class="StarterPlayerScripts" referent="23">
         <Properties>
           <string name="Name">StarterPlayerScripts</string>
         </Properties>
-        <Item class="LocalScript" referent="23">
+        <Item class="LocalScript" referent="24">
           <Properties>
             <string name="Name">Hey</string>
             <string name="Source"><![CDATA[print("Hello world, from client!")
@@ -255,13 +298,13 @@ end)</string>
         </Item>
       </Item>
     </Item>
-    <Item class="Workspace" referent="24">
+    <Item class="Workspace" referent="25">
       <Properties>
         <string name="Name">Workspace</string>
         <bool name="FilteringEnabled">true</bool>
         <bool name="NeedsPivotMigration">false</bool>
       </Properties>
-      <Item class="Part" referent="25">
+      <Item class="Part" referent="26">
         <Properties>
           <string name="Name">Baseplate</string>
           <bool name="Anchored">true</bool>
