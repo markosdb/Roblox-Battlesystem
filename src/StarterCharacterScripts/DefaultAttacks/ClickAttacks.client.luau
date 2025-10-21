@@ -12,6 +12,7 @@ UserInputService.InputBegan:Connect(function(Input, GameProcessedEvent)
     if GameProcessedEvent then return end
     if Input.UserInputType == Enum.UserInputType.MouseButton1 and not IsBlocking then
         Events.ClickAttack:FireServer()
+        print("Fired ClickAttack event")
     end
 
     if Input.KeyCode == Enum.KeyCode.F then

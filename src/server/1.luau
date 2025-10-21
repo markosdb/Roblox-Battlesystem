@@ -1,1 +1,3 @@
-print("ts a test!!")
+local module = {}
+
+return module

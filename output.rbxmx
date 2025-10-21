@@ -75,7 +75,84 @@ end)</string>
         <Properties>
           <string name="Name">ServerAttackhandler</string>
           <token name="RunContext">0</token>
-          <string name="Source"></string>
+          <string name="Source">local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+
+local Events = ReplicatedStorage.Events
+
+local AttackHitboxes = require(script.Parent.AttackHitboxes)
+
+local ClickAttackDebounces = {}
+
+Events.ClickAttack.OnServerEvent:Connect(function(Player)
+    local Character = Player.Character
+    if not Character then
+        warn("[ServerAttackhandler] Player has no Character")
+        return
+    end
+    local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+    if not Humanoid then
+        warn("[ServerAttackhandler] Humanoid missing for", Player.Name)
+        return
+    end
+    if Humanoid.Health and Humanoid.Health &lt;= 0 then
+        warn("[ServerAttackhandler] Humanoid dead for", Player.Name)
+        return
+    end
+    if ClickAttackDebounces[Player] then
+        return
+    end
+
+    ClickAttackDebounces[Player] = true
+    local PunchCombo = Player.Values.PunchCombo
+    local animContainer = script:FindFirstChild("PunchAnimationCycle")
+    if not animContainer then
+        warn("[ServerAttackhandler] PunchAnimationCycle folder not found under script")
+        ClickAttackDebounces[Player] = nil
+        return
+    end
+    local animName = tostring(PunchCombo.Value)
+    local Animation = animContainer:FindFirstChild(animName)
+    if not Animation then
+        warn("[ServerAttackhandler] No animation child named", animName)
+        ClickAttackDebounces[Player] = nil
+        return
+    end
+    if not Animation:IsA("Animation") then
+        warn("[ServerAttackhandler] Expected Animation instance, got", Animation.ClassName)
+    end
+    if not Animation.AnimationId or Animation.AnimationId == "" then
+        warn("[ServerAttackhandler] Animation has empty AnimationId")
+    end
+    local animator = Humanoid:FindFirstChildOfClass("Animator") or Humanoid:FindFirstChild("Animator")
+    if not animator then
+        animator = Instance.new("Animator")
+        animator.Parent = Humanoid
+        warn("[ServerAttackhandler] Created Animator for", Player.Name)
+    end
+    local ok, track = pcall(function()
+        return animator:LoadAnimation(Animation)
+    end)
+    if not ok or not track then
+        warn("[ServerAttackhandler] Failed to load animation for", Player.Name, ok and tostring(track) or track)
+        ClickAttackDebounces[Player] = nil
+        return
+    end
+    track:Play()
+    warn("[ServerAttackhandler] Played animation", animName, "for", Player.Name)
+
+    if PunchCombo.Value >= #script.PunchAnimationCycle:GetChildren() then
+        PunchCombo.Value = 1
+    else
+        PunchCombo.Value += 1
+    end
+
+    task.wait((track.Length or 0) + 0.1)
+    if ClickAttackDebounces[Player] then
+        ClickAttackDebounces[Player] = nil
+    end
+
+end)</string>
         </Properties>
         <Item class="Folder" referent="11">
           <Properties>
@@ -93,7 +170,9 @@ end)</string>
             <Item class="ModuleScript" referent="14">
               <Properties>
                 <string name="Name">1</string>
-                <string name="Source">print("ts a test!")</string>
+                <string name="Source">local module = {}
+
+return module</string>
               </Properties>
             </Item>
           </Item>

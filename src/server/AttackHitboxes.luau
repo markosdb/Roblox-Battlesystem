@@ -1,1 +1,3 @@
-print("Hello world, from server!")
+local module = {}
+
+return module 
