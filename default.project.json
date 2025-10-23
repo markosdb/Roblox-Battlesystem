@@ -32,6 +32,9 @@
                 "$className": "Folder"
               }
             }
+          },
+          "PlayerBootstrap": {
+            "$path": "src/server/Services/PlayerBootstrap.luau"
           }
         },
         "Modules": {
