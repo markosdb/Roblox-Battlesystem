@@ -64,13 +64,7 @@
 
     "StarterPlayer": {
       "StarterCharacterScripts": {
-        "$className": "Folder",
-        "CharacterAttacks": {
-          "$className": "Folder",
-          "SpecialAttacksInputHandler": {
-            "$path": "src/StarterCharacterScripts/CharacterAttacks/SpecialAttacksInputHandler.client.luau"
-          }
-        }
+        "$path": "src/StarterCharaScripts"
       },
       "StarterPlayerScripts": {
           "$path": "src/client"
