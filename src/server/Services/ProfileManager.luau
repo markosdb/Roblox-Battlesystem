@@ -4,7 +4,7 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local ProfileService = require(ServerScriptService.Modules.ProfileService)
-local ProfileTemplate = require(script.ProfileFolder.ProfileTemplate)
+local ProfileTemplate = require(script.ProfileTemplate)
 
 local ProfileStore = ProfileService.GetProfileStore(
     "Test key",
@@ -56,7 +56,7 @@ end
 
 Players.PlayerAdded:Connect(PlayerAdded)
 
-Players.PlayersRemoved:Connect(function(Player)
+Players.PlayerRemoving:Connect(function(Player)
     local Profile = module.Profiles[Player]
     if Profile then
         Profile:Release()

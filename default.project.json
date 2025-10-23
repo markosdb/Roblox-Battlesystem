@@ -11,44 +11,40 @@
     },
 
     "ServerScriptService": {
-      "ServerRuntime": {
-        "$path": "src/server/ServerRuntime.server.luau"
-      },
-      "Services": {
-        "$className": "Folder",
-           "ProfileManager": {
-           "$path": "src/server/Services/ProfileManager.luau",
-           "leaderstats": {
-            "$className": "Folder"
+        "ServerRuntime": {
+          "$path": "src/server/ServerRuntime.server.luau"
         },
-         "PlayerValues": {
-             "$className": "Folder",
-             "$path": "src/server/Services/ProfileManager/PlayerValues",
-             "Values": {
-               "$className": "Folder"
-            }
-          },
-           "ProfileFolder": {
-             "$className": "Folder",
-              "ProfileTemplate": {
-               "$className": "ModuleScript",
-               "$path": "src/server/Services/ProfileManager/ProfileTemplate.module.luau"
+        "Services": {
+          "$className": "Folder",
+          "ProfileManager": {
+            "$path": "src/server/Services/ProfileManager.luau",
+            "ProfileTemplate": {
+              "$path": "src/server/Services/ProfileTemplate.module.luau"
+            },
+            "PlayerValues": {
+              "$className": "Folder",
+              "$path": "src/server/Services/ProfileManager/PlayerValues",
+              "leaderstats": {
+                "$className": "Folder"
+              },
+              "Values": {
+                "$className": "Folder"
+              }
             }
           }
-        }
-      },
-     "Modules": {
-        "$className": "Folder",
-         "AttackHitboxes": {
-          "$path": "src/server/Modules/AttackHitboxes.luau"
         },
-         "ProfileService": {
-          "$path": "src/server/Modules/ProfileService.luau"
-        }
-      },
-      "ServerAttackhandler": {
+        "Modules": {
+          "$className": "Folder",
+          "AttackHitboxes": {
+            "$path": "src/server/Modules/AttackHitboxes.luau"
+          },
+          "ProfileService": {
+            "$path": "src/server/Modules/ProfileService.luau"
+          }
+        },
+        "ServerAttackhandler": {
           "$path": "src/server/ServerAttackhandler.server.luau",
-          "PunchAnimationCycle" : {
+          "PunchAnimationCycle": {
             "$className": "Folder"
           },
           "Characters": {
@@ -63,9 +59,8 @@
           "Animations": {
             "$className": "Folder"
           }
-      }
-      
-    },
+        }
+  },
 
     "StarterPlayer": {
       "StarterCharacterScripts": {

@@ -25,7 +25,7 @@ Events.ClickAttack.OnServerEvent:Connect(function(Player)
     end
     
     ClickAttackDebounces[Player] = true
-    local PunchCombo = Player.PlayerValues.PunchCombo
+    local PunchCombo = Player.Values.PunchCombo
     local Animation = script.PunchAnimationCycle[tostring(PunchCombo.Value)]
     local LoadedPunchAnimation = Humanoid.Animator:LoadAnimation(Animation)
     LoadedPunchAnimation:Play()
