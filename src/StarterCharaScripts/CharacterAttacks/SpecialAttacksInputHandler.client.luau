@@ -18,25 +18,34 @@ local Configurations = SharedModules.Configurations
 
 local CharacterConfigurations = require(Configurations.CharacterConfigurations)
 
-local EquippedCharacterName = nil -- This should be set based on the player's equipped character
-
-local function UseSpecialAttack(AttackNumber)
-    if EquippedCharacterName == nil then return end
-    
-    local Result = Events.UseSpecialAttack:InvokeServer(AttackNumber)
-
-    if Result == true then
-        local AttackData = nil
-        for _, v in CharacterConfigurations do
-            if v.CharacterName == EquippedCharacterName then
-                AttackData = v.Attacks[AttackNumber]
-                break
-            end
-            local AttackTemplate = Attacks[tostring(AttackNumber)]
-            AttackTemplate.DebounceFrame.Size = UDim2.fromScale(1, 1)
-            TweenService:Create(AttackTemplate.DebounceFrame, TweenInfo.new(AttackData.AttackDebounce), {Size = UDim2.fromScale(1, 0)}):Play()
+local function getCharacterData(name: string)
+    for _, v in CharacterConfigurations do
+        if v.CharacterName == name then
+            return v
         end
     end
+    return nil
+end
+
+local EquippedCharacterName: string? = nil
+
+local function UseSpecialAttack(AttackNumber: number)
+    if not EquippedCharacterName then return end
+
+    local result = Events.SpecialAttack:InvokeServer(AttackNumber)
+    if result ~= true then
+        return
+    end
+
+    local charData = getCharacterData(EquippedCharacterName)
+    if not charData then return end
+    local info = charData.Attacks[AttackNumber]
+    if not info then return end
+
+    local slot = Attacks:FindFirstChild(tostring(AttackNumber))
+    if not slot then return end
+    slot.DebounceFrame.Size = UDim2.fromScale(1, 1)
+    TweenService:Create(slot.DebounceFrame, TweenInfo.new(info.AttackDebounce), { Size = UDim2.fromScale(1, 0) }):Play()
 end
 
 UserInputService.InputBegan:Connect(function(Input, GameProcessedEvent)

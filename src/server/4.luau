@@ -1,4 +1,4 @@
-local Players = game:GetService("Players")
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local CharacterConfigurations = require(ReplicatedStorage.SharedModules.Configurations.CharacterConfigurations)
@@ -16,20 +16,18 @@ for _, v in CharacterConfigurations do
 end
 
 module.AttackFunction = function(Player)
-    if Players.Values.IsAttacking.Value == false and not AttackDebounces[Player] then
-        AttackDebounces[Player] = true
-        Players.Values.IsAttacking.Value = true
+    local cfg = AttackData.Attacks[tonumber(script.Name)]
+    if not cfg then return false end
 
-        task.delay(AttackData.Attacks[tonumber(script.Name)].AttackDuration, function()
-            Players.Values.IsAttacking.Value = false
-        end)
-        task.delay(AttackData.Attacks[tonumber(script.Name)].AttackDebounce, function()
-            AttackDebounces[Player] = nil
-        end)
-        return true
-    else
+    if AttackDebounces[Player] then
         return false
     end
+
+    AttackDebounces[Player] = true
+    task.delay(cfg.AttackDebounce, function()
+        AttackDebounces[Player] = nil
+    end)
+    return true
 end
 
 return module

@@ -10,8 +10,23 @@ local CharacterConfigurations = require(ReplicatedStorage.SharedModules.Configur
 local ClickAttackDebounces = {}
 
 local function EquipCharacter(Player, CharacterName)
-    local Values = Player:WaitForChild("Values")
-    Values.Character.Value = CharacterName
+    -- Ensure Values folder and a StringValue named "Character" exist
+    local Values = Player:FindFirstChild("Values")
+    if not Values then
+        Values = Instance.new("Folder")
+        Values.Name = "Values"
+        Values.Parent = Player
+    end
+
+    local CharacterValue = Values:FindFirstChild("Character")
+    if not CharacterValue or CharacterValue.ClassName ~= "StringValue" then
+        if CharacterValue then CharacterValue:Destroy() end
+        CharacterValue = Instance.new("StringValue")
+        CharacterValue.Name = "Character"
+        CharacterValue.Parent = Values
+    end
+
+    CharacterValue.Value = CharacterName
 
     local CharacterData = nil
 
@@ -109,9 +124,47 @@ Events.Block.OnServerEvent:Connect(function(Player, Value)
 end)
 
 Events.SpecialAttack.OnServerInvoke = function(Player, AttackNumber)
-    local PlayerCharacter = Player.Values.Character.Value
-    local Result = require(script.Characters[PlayerCharacter][tostring(AttackNumber)]).AttackFunction(Player)
-    return Result
+    -- Validate inputs
+    if typeof(AttackNumber) ~= "number" then
+        warn("SpecialAttack: AttackNumber must be a number")
+        return false
+    end
+
+    local Values = Player:FindFirstChild("Values")
+    local CharacterValue = Values and Values:FindFirstChild("Character")
+    local PlayerCharacter = CharacterValue and CharacterValue.Value or nil
+
+    if type(PlayerCharacter) ~= "string" or PlayerCharacter == "" then
+        warn("SpecialAttack: Player character not set; blocking invoke")
+        return false
+    end
+
+    local CharactersFolder = script:FindFirstChild("Characters")
+    if not CharactersFolder then
+        warn("SpecialAttack: Characters folder missing under ServerAttackhandler")
+        return false
+    end
+
+    local CharacterFolder = CharactersFolder:FindFirstChild(PlayerCharacter)
+    if not CharacterFolder then
+        warn(string.format("SpecialAttack: No character folder '%s'", PlayerCharacter))
+        return false
+    end
+
+    local AttackModule = CharacterFolder:FindFirstChild(tostring(AttackNumber))
+    if not AttackModule then
+        warn(string.format("SpecialAttack: No attack '%s' for '%s'", tostring(AttackNumber), PlayerCharacter))
+        return false
+    end
+
+    local ok, result = pcall(function()
+        return require(AttackModule).AttackFunction(Player)
+    end)
+    if not ok then
+        warn("SpecialAttack: error in attack module:", result)
+        return false
+    end
+    return result == nil and true or result
 end
 
 Players.PlayerAdded:Connect(PlayerAdded)
