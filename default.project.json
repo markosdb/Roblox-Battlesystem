@@ -8,6 +8,7 @@
         "Events": {
           "$className": "Folder"
         }
+        
     },
 
     "ServerScriptService": {
@@ -53,6 +54,15 @@
               "$className": "Folder",
               "1": {
                 "$path": "src/server/1.luau"
+              },
+              "2": {
+                "$path": "src/server/2.luau"
+              },
+              "3": {
+                "$path": "src/server/3.luau"
+              },
+              "4": {
+                "$path": "src/server/4.luau"
               }
             }
           },

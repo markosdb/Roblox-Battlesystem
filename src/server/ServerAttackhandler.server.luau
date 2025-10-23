@@ -5,8 +5,33 @@ local Players = game:GetService("Players")
 local Events = ReplicatedStorage.Events
 
 local AttackHitboxes = require(script.Parent.Modules.AttackHitboxes)
+local CharacterConfigurations = require(ReplicatedStorage.SharedModules.Configurations.CharacterConfigurations)
 
 local ClickAttackDebounces = {}
+
+local function EquipCharacter(Player, CharacterName)
+    local Values = Player:WaitForChild("Values")
+    Values.Character.Value = CharacterName
+
+    local CharacterData = nil
+
+    for _,v in CharacterConfigurations do
+        if v.CharacterName == CharacterName then
+            CharacterData = v
+            break
+        end
+    end
+
+    Events.EquipCharacterClient:FireClient(Player, CharacterData)
+end
+
+local function PlayerAdded(Player)
+    Player.CharacterAdded:Connect(function(Character)
+         print("looaaded!")
+         task.wait(1)
+         EquipCharacter(Player, "Hunter")
+    end)
+end
 
 Events.ClickAttack.OnServerEvent:Connect(function(Player)
     local Character = Player.Character
@@ -82,3 +107,18 @@ Events.Block.OnServerEvent:Connect(function(Player, Value)
         Blocking.Parent = Character
     end
 end)
+
+Events.SpecialAttack.OnServerInvoke = function(Player, AttackNumber)
+    local PlayerCharacter = Player.Values.Character.Value
+    local Result = require(script.Characters[PlayerCharacter][tostring(AttackNumber)]).AttackFunction(Player)
+    return Result
+end
+
+Players.PlayerAdded:Connect(PlayerAdded)
+
+for _, v in Players:GetPlayers() do
+    task.spawn(function()
+        PlayerAdded(v)
+    end)
+
+end
