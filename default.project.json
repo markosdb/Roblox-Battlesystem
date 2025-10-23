@@ -11,20 +11,42 @@
     },
 
     "ServerScriptService": {
-      "ProfileManager": {
-        "$path": "src/server/ProfileManager.luau",
-        "ProfileFolder": {
-          "$className": "Folder",
-          "ProfileTemplate": {
-            "$className": "ModuleScript",
-            "$path": "src/server/ProfileManager/ProfileTemplate.module.luau"
+      "ServerRuntime": {
+        "$path": "src/server/ServerRuntime.server.luau"
+      },
+      "Services": {
+        "$className": "Folder",
+           "ProfileManager": {
+           "$path": "src/server/Services/ProfileManager.luau",
+           "leaderstats": {
+            "$className": "Folder"
+        },
+         "PlayerValues": {
+             "$className": "Folder",
+             "$path": "src/server/Services/ProfileManager/PlayerValues",
+             "Values": {
+               "$className": "Folder"
+            }
+          },
+           "ProfileFolder": {
+             "$className": "Folder",
+              "ProfileTemplate": {
+               "$className": "ModuleScript",
+               "$path": "src/server/Services/ProfileManager/ProfileTemplate.module.luau"
+            }
           }
         }
       },
-        "AttackHitboxes": {
-          "$path": "src/server/AttackHitboxes.luau"
+     "Modules": {
+        "$className": "Folder",
+         "AttackHitboxes": {
+          "$path": "src/server/Modules/AttackHitboxes.luau"
         },
-        "ServerAttackhandler": {
+         "ProfileService": {
+          "$path": "src/server/Modules/ProfileService.luau"
+        }
+      },
+      "ServerAttackhandler": {
           "$path": "src/server/ServerAttackhandler.server.luau",
           "PunchAnimationCycle" : {
             "$className": "Folder"
@@ -41,19 +63,9 @@
           "Animations": {
             "$className": "Folder"
           }
-
-        },
-        "DataHandler": {
-          "$path": "src/server/DataHandler.server.luau",
-          "PlayerValues": {
-            "$className": "Folder",
-            "$path": "src/server/DataHandler/PlayerValues",
-            "Values": {
-              "$className": "Folder"
-            }
-          }
-        }
-     },
+      }
+      
+    },
 
     "StarterPlayer": {
       "StarterCharacterScripts": {
