@@ -34,6 +34,19 @@ local function ensureDefaults(player)
 		characterValue.Value = ""
 		characterValue.Parent = values
 	end
+
+	-- Ensure 'IsAttacking' BoolValue (default false) used by attack modules
+	local isAttacking = values:FindFirstChild("IsAttacking")
+	if isAttacking and not isAttacking:IsA("BoolValue") then
+		isAttacking:Destroy()
+		isAttacking = nil
+	end
+	if not isAttacking then
+		isAttacking = Instance.new("BoolValue")
+		isAttacking.Name = "IsAttacking"
+		isAttacking.Value = false
+		isAttacking.Parent = values
+	end
 end
 
 -- Bootstrap existing players (e.g., when requiring after some joins)
