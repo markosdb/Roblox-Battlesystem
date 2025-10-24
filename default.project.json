@@ -7,7 +7,14 @@
         "$path": "src/shared",
         "Events": {
           "$className": "Folder"
+        },
+        "Animation": {
+          "$className": "Folder"
+        },
+        "Assets": {
+          "$className": "Folder"
         }
+
         
     },
 
