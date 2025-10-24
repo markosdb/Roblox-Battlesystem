@@ -5,7 +5,7 @@ local ProfileManager = require(ServerScriptService.Services.ProfileManager)
 
 local module = {}
 
-function module.createHitbox(Character, HitboxSize, Damage, Blockable)
+function module.createHitbox(Character, HitboxSize, Damage, Blockable, HitboxCFrame)
     local Player = Players:GetPlayerFromCharacter(Character)
     local Profile = ProfileManager.Profiles[Player]
     local Hitbox = Instance.new("Part")
@@ -14,7 +14,12 @@ function module.createHitbox(Character, HitboxSize, Damage, Blockable)
     Hitbox.CanCollide = false
     Hitbox.Anchored = true
     Hitbox.Size = HitboxSize
-    Hitbox.CFrame = Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -3)
+    if HitboxCFrame then
+        Hitbox.CFrame = HitboxCFrame
+    else
+        Hitbox.CFrame = Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -3)
+    end
+    
     Hitbox.Parent = workspace
 
     local PartsInHitbox = workspace:GetPartsInPart(Hitbox)

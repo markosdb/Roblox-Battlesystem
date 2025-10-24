@@ -4,8 +4,8 @@ return {
         Attacks = {
             {
                 AttackName = "Attack 1",
-                AttackDebounce = 5,
-                AttackDuration = 2,
+                AttackDebounce = 10,
+                AttackDuration = 3,
             },
             {
                 AttackName = "Attack 2",

@@ -13,7 +13,6 @@ local MainGui = PlayerGui:WaitForChild("MainGui")
 local Attacks = MainGui.Attacks
 local AttackTemplate = Attacks:FindFirstChild("AttackTemplate")
 
-
 local SharedModules = ReplicatedStorage:WaitForChild("SharedModules")
 local Configurations = SharedModules.Configurations
 
